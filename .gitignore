@@ -1,0 +1,4 @@
+backend-API/node_modules*
+frontend-REACT/node_modules*
+backend-API/.env
+frontend-REACT/.env
