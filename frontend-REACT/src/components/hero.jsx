@@ -5,11 +5,11 @@ function Hero() {
         <div>
             <div className="flex hero items-center bg-base-200">
                 <div className="hero-content flex-col lg:flex-row">
-                    <div>
+                    <div className='flex flex-col gap-4'>
                         <h1 className="text-5xl font-bold">⌚CuyModoro</h1>
-                        <p className="py-6">
-                        <input type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
-                        </p>
+                        <div>
+                            <input type="text" placeholder="Type here" className="input input-bordered w-full rounded-md" />
+                        </div>
                         <button className="btn btn-primary">Get Started</button>
                     </div>
                 </div>
