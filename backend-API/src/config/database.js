@@ -1,4 +1,5 @@
 const mysql = require('mysql2')
+
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -6,6 +7,12 @@ const connection = mysql.createConnection({
     database: 'cuymodoro-db'
 })
 
-connection.connect()
+connection.connect((err) => {
+    if (err) {
+        console.log("Error connected to MySQL Database", err);
+        return;
+    }
+    console.log('Connected to database');
+})
 
 module.exports = connection

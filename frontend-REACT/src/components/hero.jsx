@@ -3,7 +3,7 @@ import React from 'react'
 function Hero() {
     return (
         <div>
-            <div className="flex hero items-center bg-base-200">
+            <div className="flex hero items-center">
                 <div className="hero-content flex-col lg:flex-row">
                     <div className='flex flex-col gap-4'>
                         <h1 className="text-5xl font-bold">⌚CuyModoro</h1>
