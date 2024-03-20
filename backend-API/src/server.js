@@ -1,7 +1,11 @@
 const hyperExpress = require("hyper-express")
 const hyper = new hyperExpress.Server()
-const PORT = process.env.PORT || 3838
 const db = require("./config/database")
+const dotenv = require("dotenv")
+
+dotenv.config()
+
+const PORT = process.env.PORT || 3838
 
 const auth_middleware = (req, res, next) => {
     console.log("Auth Protection bro...")
