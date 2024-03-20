@@ -2,6 +2,7 @@ const hyperExpress = require("hyper-express")
 const hyper = new hyperExpress.Server()
 const db = require("./config/database")
 const dotenv = require("dotenv")
+const cors = require("cors")
 
 dotenv.config()
 
@@ -11,6 +12,8 @@ const auth_middleware = (req, res, next) => {
     console.log("Auth Protection bro...")
     next()
 }
+
+hyper.use(cors());
 
 hyper.get('/', {middlewares: [auth_middleware]}, async (req, res) => {
     console.log("Get API Readyyy...")   

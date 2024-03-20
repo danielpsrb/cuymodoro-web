@@ -1,13 +1,17 @@
 import "./App.css"
 import Layouts from "./components/layouts"
 import Hero from "./components/hero"
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 
+const queryClient= new QueryClient()
 function App() {
 
   return (
-    <Layouts>
-      <Hero />
-    </Layouts>
+    <QueryClientProvider client={queryClient}>
+      <Layouts>
+        <Hero />
+      </Layouts>
+    </QueryClientProvider>
   )
 }
 
