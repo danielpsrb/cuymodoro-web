@@ -21,6 +21,17 @@ hyper.get('/', {middlewares: [auth_middleware]}, async (req, res) => {
     res.json({
         status: "OK",
         API_version: '1.0.0'
+    });
+});
+
+const features_router = new hyperExpress.Router()
+
+features_router.post("/add", async (req, res) => {
+    const { title, level } = await req.json();
+    db.query(`INSERT INTO features (username, title, level) VALUES ('admin', '${title}', '${level}')`, (err, result) => {
+        if (err) throw new Error("error adding features")
+        console.log(result)
+        res.send("success")
     })
 })
 
@@ -43,6 +54,7 @@ users_router.post("/login", (req, res) => {
 })
 
 hyper.use("/users", users_router)
+hyper.use("/features", features_router)
 
 hyper.listen(PORT)
         .then(() => console.log(`SERVER listening on port ${PORT}`))
