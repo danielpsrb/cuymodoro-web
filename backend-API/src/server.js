@@ -14,6 +14,7 @@ const auth_middleware = (req, res, next) => {
 }
 
 hyper.use(cors());
+hyper.use(hyperExpress.json());
 
 hyper.get('/', {middlewares: [auth_middleware]}, async (req, res) => {
     console.log("Get API Readyyy...")   
@@ -27,15 +28,32 @@ hyper.get('/', {middlewares: [auth_middleware]}, async (req, res) => {
 const features_router = new hyperExpress.Router()
 
 features_router.post("/add", async (req, res) => {
-    const { title, level } = await req.json();
-    db.query(`INSERT INTO features (username, title, level) VALUES ('admin', '${title}', '${level}')`, (err, result) => {
-        if (err) throw new Error("error adding features")
+    try {
+        const { title, level } = await req.json();
+        db.query(`INSERT INTO features (username, title, level) VALUES ('admin', '${title}', '${level}')`, (err, result) => {
+            if (err) console.error("Error executing SQL query:", err);
+            console.log(result)
+            res.json({
+                id: result.insertId
+            })
+        })
+    } catch (error) {
+        console.error("error disini", error)
+        res.status(500).send("error adding features")
+    }
+})
+
+features_router.put("/finish", async (req, res) => {
+    const { id, end_time } = req.body
+    db.query(`update features set end_time='${end_time}' where id='${id}'`, (err, result) => {
+        if (err) console.error("Error executing SQL query:", err);
         console.log(result)
-        res.send("success")
+        res.send("Features Finished")
     })
 })
 
-const users_router = new hyperExpress.Router()
+
+const users_router = new hyperExpress.
 
 users_router.get("/profile", (req, res) => {
     db.query("SELECT * FROM users", (err, result) => {
