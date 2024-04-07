@@ -25,15 +25,35 @@ hyper.get('/', {middlewares: [auth_middleware]}, async (req, res) => {
     });
 });
 
-const features_router = new hyperExpress.Router()
+const features_router = new hyperExpress.Router();
 
-features_router.get("/status/:id", async (req, res) => {
-    const { id } = req.params
-    db.query(`SELECT status FROM features WHERE id='${id}'`, (err, result) => {
-        if (err) throw new Error("error getting users", err)
-        res.json({ status: result[0].status })
-    })
-})
+features_router.get("/last/:username", async (req, res) => {
+    const { username } = req.params;
+    console.log(username)
+    db.query(`SELECT * FROM features WHERE username = '${username}' ORDER BY ID DESC LIMIT 1;
+    `, (err, result) => {
+        if (err) {
+            console.error("Error getting status by id", err);
+            res.status(500).json({ error: "Internal server error" });
+            return;
+        }
+        res.json({ features: result[0] })
+    });
+});
+
+features_router.get("/:id", async (req, res) => {
+    const { id } = req.params;
+    db.query(`SELECT title, level FROM features where id='${id}'`, (err, result) => {
+        if (err) {
+            console.error("Error getting status by id", err);
+            res.status(500).json({ error: "Internal server error" });
+            return;
+        }
+        res.json({ title: result[0].title, level: result[0].level })
+    });
+});
+
+
 
 features_router.post("/add", async (req, res) => {
     try {
