@@ -13,46 +13,62 @@ function timeNow() {
 function Hero() {
     const [title, setTitle] = useState("");
     const [level, setLevel] = useState("");
-    const [isStarted, setIsStarted] = useState(false);
+    const [status, setStatus] = useState("");
+    const [statusButton, setStatusButton] = useState("Mulai");
+    const [id, setId] = useState(0);
 
     const addFeatures = useMutation({
         mutationFn: ({ title, level }) => {
             axios.post("http://localhost:3003/features/add", {
                 title,
                 level,
-            }).then((r) => localStorage.setItem('featureId', r.data.id)).catch(() => { "error" });
+            }).then((r) => setId(r.data.id)).catch(() => { "error" });
         }
     });
 
     const breakFeatures = useMutation({
         mutationFn: () => {
             axios.put("http://localhost:3003/features/break", {
-                id: localStorage.getItem('featureId'),
+                id,
                 break_time: timeNow(),
             });
-            axios.get(`http://localhost:3003/features/status/${localStorage.getItem('featureId')}`)
-                .then((r) => localStorage.setItem('status', r.data.status))
-                .catch((e) => console.log('Error fetching datas'));
+            // axios.get(`http://localhost:3003/features/status/${localStorage.getItem('featureId')}`)
+            //     .then((r) => localStorage.setItem('status', r.data.status))
+            //     .catch((e) => console.log('Error fetching datas'));
         },
     });
 
     const getLastData = () => {
         axios.get(
-            `http://localhost:3003/features/get/${localStorage.getItem("featureId")}`
+            `http://localhost:3003/features/last/${localStorage.getItem("username")}`
         ).then((r) =>{
-            setTitle(r.data.title);
-            setLevel(r.data.level);
-        } )
-    }
+            console.log("features", r.data)
+            setId(r.data.features.id);
+            setTitle(r.data.features.title);
+            setLevel(r.data.features.level);
+            setStatus(r.data.features.status);
+
+            switch (r.data.features.status) {
+                case "ongoing":
+                    setStatusButton("break dlu bro")
+                    break;
+                case "break":
+                    setStatusButton("Continue")
+                default:
+                    setStatusButton("Mulai")
+                    break;
+            }
+            if (r.data.features.status == "break") {
+                setStatusButton("Lanjutkan")
+            }
+        });
+    };
 
     useEffect(() => {
         localStorage.setItem("username", 'admin');
         getLastData()
-        const featureId = localStorage.getItem('featureId');
-        if (featureId) {
-            console.log({ featureId });
-        }
     }, []);
+    
 
     return (
         <div className="flex hero items-center">
@@ -69,9 +85,9 @@ function Hero() {
                             placeholder="Fitur yang ingin Anda kerjakan"
                             className="input input-bordered w-full max-w-xl py-2 px-4 rounded-md"
                             onChange={(e) => setTitle(e.target.value)}
-                            value={title}
+                            defaultValue={title}
                         />
-                        <select defaultValue={'DEFAULT'} className="select select-bordered w-full max-w-xl py-2 px-4" onChange={(e) => setLevel(e.target.value)}>
+                        <select defaultValue={level} className="select select-bordered w-full max-w-xl py-2 px-4" onChange={(e) => setLevel(e.target.value)}>
                             <option value="DEFAULT" disabled >Pilih Break Level?</option>
                             <option value={"newcommers"}>New Commer</option>
                             <option value={"reguler"}>Reguler</option>
@@ -79,21 +95,25 @@ function Hero() {
                         </select>
                     </div>
                     {addFeatures.isSuccess ? <div>Fitur added !</div> : null}
-                    {localStorage.getItem('status') && <div>Status: {localStorage.getItem('status')}</div>}
+                    {status && <div>Status: {status}</div>}
                     {breakFeatures.isSuccess ? <div>Take a break for xx:xx minutes</div> : null}
                     <button
                         className='btn btn-primary'
                         onClick={() => {
-                            if (isStarted) {
-                                breakFeatures.mutate();
-                                setIsStarted(false);
-                            } else {
-                                addFeatures.mutate({ title, level });
-                                setIsStarted(true);
+                            switch (status) {
+                                case "ongoing":
+                                    breakFeatures.mutate();
+                                    break;
+                                case "break":
+                                    //
+                                    break;
+                                default:
+                                    addFeatures.mutate({ title, level });
+                                    break;
                             }
                         }}
                     >
-                        {isStarted ? "Pause" : "Mulai Lagi"}
+                        {statusButton}
                     </button>
                     <button onClick={() => {
                         alert(`feature ${title} selesai`)
